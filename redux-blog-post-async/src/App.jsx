@@ -1,11 +1,17 @@
-import { useState } from 'react'
-
 import PostList from './features/post/PostList'
 import AddPost from './features/post/AddPost'
+import { useDispatch } from 'react-redux'
+import { fetchUsers } from './features/users/userSlice'
+import { useEffect } from 'react'
+
 
 function App() {
-  
+    // const dispatch = useDispatch()
+    // useEffect(()=>{
+    //   dispatch(fetchUsers())
 
+    // },[])
+  
   return (
     <>
       <div className='max-w-screen-lg  mx-auto bg-blue-100 min-h-screen'>

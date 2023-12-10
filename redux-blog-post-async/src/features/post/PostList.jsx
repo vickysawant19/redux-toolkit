@@ -1,51 +1,48 @@
-import { useSelector } from "react-redux";
-import {selectAllPosts} from './postSlice'
+import { useSelector,useDispatch } from "react-redux";
+import {selectAllPosts,getPostsStatus,getPostsError,fetchPosts} from './postSlice'
+import { useEffect } from "react";
+
+import PostExcert from "./PostExcert";
 
 import React from 'react'
-import { nanoid } from "@reduxjs/toolkit";
 
-import PostAuthor from "./PostAuthor";
 
-import PostTime from "./PostTime";
-import ReactionBtn from "./ReactionBtn";
 
 
 const PostList = () => {
+  const dispatch = useDispatch()
 
   const posts = useSelector(selectAllPosts)
-   
-  const  sortedPosts = posts.slice().sort((a,b) => b.postTime.localeCompare(a.postTime))
-  
+  const postsStatus = useSelector(getPostsStatus)
+  const postsError = useSelector(getPostsError)
 
+  useEffect(()=>{
+    if(postsStatus === 'idle'){
+      dispatch(fetchPosts())
+      
+    }
     
+  },[postsStatus,dispatch])
 
-    const renderPost = sortedPosts.map(post=>(
-        
-        <article
-        className="bg-blue-200 hover:bg-blue-300 mb-2 p-2 transition duration-500 shadow" key={post.id}>
-         
-            <h3 className="font-semibold ">{post.title}</h3>
-            <p className="">{post.content?.substring(0,50)}</p>
-           <div className="flex justify-between">
-                <div className="text-sm italic">
-              <PostAuthor userid = {post.userId}/>
-                </div>
-                <div className="text-sm italic text-stone-600">
-              <PostTime timestamp = {post.postTime} />
-              </div>
-           </div>
-           <div>
-             <ReactionBtn post={post} />
-           </div>
-       </article>
-))
+
+  
+   let content;
+    if(postsStatus === 'loading'){
+      content = <p>Loading...</p>
+    }else if (postsStatus === 'succeeded'){
+      const orderedPost = posts.slice().sort((a,b) => b.postTime.localeCompare(a.postTime))
+     
+      content = orderedPost.map(post => <PostExcert key={post.id} post={post}/> ) 
+    }else if (postsStatus === 'failed'){
+      content = <p>{error}</p>
+    }
+   
+
   return (
     <>
-       
        <div className="w-full">
-       {renderPost}
+        {content}
        </div>
-    
     </>
   )
 }
